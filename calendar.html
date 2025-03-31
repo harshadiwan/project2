@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Calendar</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            background: #f4f4f4;
+            padding: 20px;
+        }
+        .container { 
+            max-width: 450px; 
+            margin: auto; 
+            padding: 20px; 
+            background: white; 
+            border-radius: 8px; 
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        input, button { 
+            width: 100%; 
+            padding: 10px; 
+            margin-top: 10px; 
+            border-radius: 5px; 
+            border: 1px solid #ccc;
+        }
+        button { 
+            background: green; 
+            color: white; 
+            border: none; 
+            cursor: pointer; 
+            transition: 0.3s; 
+        }
+        button:hover { background: darkgreen; }
+        .list-container { 
+            text-align: left; 
+            padding: 10px; 
+            border-radius: 5px; 
+            margin-top: 15px; 
+            background: #e9ffe9; 
+        }
+        .list-container ul { 
+            padding-left: 20px; 
+        }
+        .link { 
+            margin-top: 15px; 
+            display: block; 
+            text-decoration: none; 
+            color: #007bff; 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Attendance Calendar</h2>
+        <input type="text" id="username" placeholder="Enter Username">
+        <input type="month" id="monthPicker">
+        <button onclick="fetchAttendance()">Show Calendar</button>
+        <button onclick="showMonthlyCount()">Show Monthly Attendance</button>
+        
+        <div id="attendanceList" class="list-container"></div>
+        <p id="presentCount"></p>
+
+        <a href="land.html" class="link">Back to Mark Attendance</a>
+    </div>
+
+    <script>
+        function fetchAttendance() {
+            const username = document.getElementById("username").value.trim();
+            const monthPicker = document.getElementById("monthPicker").value;
+            if (!username || !monthPicker) {
+                alert("Please enter a username and select a month.");
+                return;
+            }
+
+            const [year, month] = monthPicker.split("-");
+
+            fetch(`https://project-cwm3.onrender.com/attendance?username=${encodeURIComponent(username)}&year=${year}&month=${month}`)
+                .then(response => response.json())
+                .then(data => displayAttendance(data))
+                .catch(error => console.error("Error fetching attendance:", error));
+        }
+
+        function displayAttendance(attendanceData) {
+            const attendanceList = document.getElementById("attendanceList");
+            attendanceList.innerHTML = "<h3>Present Days:</h3>";
+            
+            if (attendanceData.length === 0) {
+                attendanceList.innerHTML += "<p><strong>No attendance records found.</strong></p>";
+                return;
+            }
+
+            let list = "<ul>";
+            attendanceData.forEach(att => {
+                list += `<li>${att.date}</li>`;
+            });
+            list += "</ul>";
+            attendanceList.innerHTML += list;
+        }
+
+        function showMonthlyCount() {
+            const username = document.getElementById("username").value.trim();
+            const monthPicker = document.getElementById("monthPicker").value;
+            if (!username || !monthPicker) {
+                alert("Please enter a username and select a month.");
+                return;
+            }
+
+            const [year, month] = monthPicker.split("-");
+
+            fetch(`https://project-cwm3.onrender.com/attendance-count?username=${encodeURIComponent(username)}&year=${year}&month=${month}`)
+                .then(response => response.json())
+                .then(data => {
+                    const presentCountDiv = document.getElementById("presentCount");
+
+                    if (data.count > 0) {
+                        presentCountDiv.innerHTML = `<strong>Total Present Days:</strong> ${data.count}`;
+                    } else {
+                        presentCountDiv.innerHTML = "<strong>No attendance records found for this month.</strong>";
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching attendance count:", error);
+                    alert("Error fetching attendance. Please check the server.");
+                });
+        }
+    </script>
+</body>
+</html>

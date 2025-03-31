@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TableLink - Staff Attendance</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+        }
+
+        .company-heading {
+            font-size: 36px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            width: 350px;
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .btn {
+            width: 100%;
+            background: #28a745;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            background: #218838;
+        }
+
+        .link {
+            display: block;
+            margin-top: 15px;
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .link:hover {
+            text-decoration: underline;
+        }
+
+        #message {
+            margin-top: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <div class="company-heading">TableLink - Staff Attendance</div>
+
+    <div class="container">
+        <h2>Mark Attendance</h2>
+        <input type="text" id="username" placeholder="Enter your username">
+        <button class="btn" onclick="markAttendance()">Mark Attendance</button>
+        <p id="message"></p>
+        <a href="calendar.html" class="link">View Attendance Calendar</a>
+    </div>
+
+    <script>
+        function markAttendance() {
+            const username = document.getElementById("username").value.trim();
+            const messageBox = document.getElementById("message");
+
+            if (!username) {
+                messageBox.textContent = "⚠️ Please enter a username.";
+                messageBox.style.color = "red";
+                return;
+            }
+
+            fetch("https://project-cwm3.onrender.com/mark-attendance", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username })
+            })
+            .then(response => response.json())
+            .then(data => {
+                messageBox.textContent = data.message;
+                messageBox.style.color = "green";
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                messageBox.textContent = "❌ Failed to mark attendance.";
+                messageBox.style.color = "red";
+            });
+        }
+    </script>
+</body>
+</html>
